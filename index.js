@@ -15,6 +15,7 @@ const asCompiler = require("assemblyscript/cli/asc");
 const { basename, join } = require("path");
 const { tmpdir } = require("os");
 const fsp = require("fs/promises");
+const { dataToEsm } = require("@rollup/pluginutils");
 
 const MARKER = "asc:";
 const PREFIX_MATCHER = /^asc:(.+)$/;
@@ -113,6 +114,10 @@ function asc(opts) {
         export const wasmUrl = import.meta.ROLLUP_FILE_URL_${referenceId};
         export default wasmUrl;
       `;
+    },
+    // a little shitty temporary fix because of forced es2018 setting on sveltekit
+    resolveFileUrl({ fileName }) {
+      return `new URL('${fileName}', document.baseURI).href`;
     }
   };
 }
